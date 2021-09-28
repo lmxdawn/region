@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>地区联动</title>
+    <script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+    <style>
+        .content {
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .content-item {
+            border: 1px solid #333333;
+            /*padding: 50rpx;*/
+        }
+        .content-item-ii {
+            padding: 5px;
+            border: 1px solid #333333;
+        }
+    </style>
+
+</head>
+<body>
+
+<div id="main">
+    <div class="content">
+        <div class="content-item">
+            <div class="content-item-ii" v-for="item in provinceList" :key="item.id" @click="getCityList(item)">{{item.name}}</div>
+        </div>
+        <div class="content-item">
+            <div class="content-item-ii" v-for="item in cityList" :key="item.id" @click="getCountyList(item)">{{item.name}}</div>
+        </div>
+        <div class="content-item">
+            <div class="content-item-ii" v-for="item in countyList" :key="item.id" @click="getTownList(item)">{{item.name}}</div>
+        </div>
+        <div class="content-item">
+            <div class="content-item-ii" v-for="item in townList" :key="item.id">{{item.name}}</div>
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+    new Vue({
+        el: '#main',
+        data() {
+            return {
+                provinceList: [],
+                cityList: [],
+                countyList: [],
+                townList: [],
+                provinceId: 0,
+                cityId: 0,
+                countyId: 0,
+                townId: 0,
+            }
+        },
+        created() {
+            this.getProvinceList()
+        },
+        methods: {
+            getProvinceList() {
+                this.cityList = [];
+                this.countyList = [];
+                this.townList = [];
+                this.list({provinceId: 0, cityId: 0, countyId: 0})
+                    .then(res => {
+                        this.provinceList = res.data
+                    })
+            },
+            getCityList(item) {
+                this.provinceId = item.id
+                this.countyList = [];
+                this.townList = [];
+                if (item.isLeaf) {
+                    console.log("当前是叶子节点")
+                }
+                this.list({provinceId: this.provinceId, cityId: 0, countyId: 0})
+                    .then(res => {
+                        this.cityList = res.data
+                    })
+            },
+            getCountyList(item) {
+                this.cityId = item.id
+                this.townList = []
+                if (item.isLeaf) {
+                    console.log("当前是叶子节点")
+                }
+                this.list({provinceId: this.provinceId, cityId: this.cityId, countyId: 0})
+                    .then(res => {
+                        this.countyList = res.data
+                    })
+            },
+            getTownList(item) {
+                this.countyId = item.id
+                if (item.isLeaf) {
+                    console.log("当前是叶子节点")
+                }
+                this.list({provinceId: this.provinceId, cityId: this.cityId, countyId: this.countyId})
+                    .then(res => {
+                        this.townList = res.data
+                    })
+            },
+            list(obj) {
+                return new Promise((resolve, reject) => {
+                    var xmlhttp;
+                    if (window.XMLHttpRequest) {
+                        //  IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
+                        xmlhttp = new XMLHttpRequest();
+                    } else {
+                        // IE6, IE5 浏览器执行代码
+                        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                    }
+                    xmlhttp.onreadystatechange = function () {
+                        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                            resolve(JSON.parse(xmlhttp.responseText))
+                        }
+                    }
+                    xmlhttp.open("GET", `http://localhost:9001/other/region/list?provinceId=${obj.provinceId}&cityId=${obj.cityId}&countyId=${obj.countyId}`, true);
+                    xmlhttp.send();
+                })
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
