@@ -35,3 +35,9 @@
 # 效果
 
 ![](./pic/img.png)
+
+# Git 设置
+
+`git config --local user.name ""`
+
+`git config --local user.email ""`
