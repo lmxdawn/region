@@ -28,7 +28,7 @@
 
 # 示例（需替换请求接口）
 
-> 在线示例：https://codepen.io/jac142857/pen/GREPWvO
+> 在线示例 ：https://codepen.io/jac142857/pen/GREPWvO
  
 >  代码 `region.html`
 
